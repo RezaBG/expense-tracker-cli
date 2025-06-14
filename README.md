@@ -40,3 +40,7 @@ go run . summary
 # Show monthly expenses
 go run . summary --month 6
 ```
+
+## Project Submission
+
+This project was built as part of the [Expense Tracker CLI project challenge on roadmap.sh](https://roadmap.sh/projects/expense-tracker-cli).

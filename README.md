@@ -1,4 +1,4 @@
-# 🚀 Roadmap Projects
+# Roadmap Projects
 
 A collection of small projects for learning programming concepts and improving skills.
 

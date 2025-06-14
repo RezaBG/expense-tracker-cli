@@ -34,9 +34,9 @@ func main() {
 	case "list":
 		handleList()
 	case "delete":
-		fmt.Println("Delete command triggered")
+		handleDelete(args[2:])
 	case "summary":
-		fmt.Println("Summary command triggered")
+		handleSummary(args[2:])
 	default:
 		fmt.Printf("Unknown command: %s\n", command)
 		showUsage()
@@ -135,6 +135,89 @@ func handleList() {
 	fmt.Printf("%-4s %-12s %-20s %s\n", "ID", "Date", "Description", "Amount")
 	for _, exp := range expenses {
 		fmt.Printf("%-4d %-12s %-20s $%.2f\n", exp.ID, exp.Date, exp.Description, exp.Amount)
+	}
+}
+
+func handleDelete(arguments []string) {
+	deleteCmd := flag.NewFlagSet("delete", flag.ExitOnError)
+	id := deleteCmd.Int("id", 0, "Expense ID to delete")
+
+	deleteCmd.Parse(arguments)
+
+	if *id <= 0 {
+		fmt.Println("Expense ID must be greater than 0")
+		return
+	}
+
+	expenses, err := loadExpenses()
+	if err != nil {
+		fmt.Println("Error loading expenses:", err)
+		return
+	}
+
+	// Find and delete the expense
+	found := false
+	newExpenses := []Expense{}
+
+	for _, exp := range expenses {
+		if exp.ID == *id {
+			found = true
+			continue // Skip the expense to delete it
+		}
+		newExpenses = append(newExpenses, exp)
+	}
+
+	if !found {
+		fmt.Printf("Expense with ID %d not found.\n", *id)
+		return
+	}
+
+	err = saveExpenses(newExpenses)
+	if err != nil {
+		fmt.Println("Error saving expenses:", err)
+		return
+	}
+
+	fmt.Printf("Expense with ID %d deleted successfully.\n", *id)
+}
+
+func handleSummary(arguments []string) {
+	summaryCmd := flag.NewFlagSet("summary", flag.ExitOnError)
+	month := summaryCmd.Int("month", 0, "Month number (1-12)")
+
+	summaryCmd.Parse(arguments)
+
+	expenses, err := loadExpenses()
+	if err != nil {
+		fmt.Println("Error loading expenses:", err)
+		return
+	}
+
+	if len(expenses) == 0 {
+		fmt.Println("No expenses found for summary.")
+		return
+	}
+
+	total := 0.0
+
+	for _, exp := range expenses {
+		if *month > 0 {
+			expensesTime, err := time.Parse("2006-01-02", exp.Date)
+			if err != nil {
+				continue
+			}
+			if int(expensesTime.Month()) != *month {
+				continue
+			}
+		}
+		total += exp.Amount
+	}
+
+	// Print results
+	if *month > 0 {
+		fmt.Printf("Total expenses for month %d: $%.2f\n", *month, total)
+	} else {
+		fmt.Printf("Total expenses: $%.2f\n", total)
 	}
 }
 

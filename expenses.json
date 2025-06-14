@@ -10,5 +10,11 @@
     "description": "Dinner",
     "amount": 10,
     "date": "2025-06-14"
+  },
+  {
+    "id": 3,
+    "description": "Benzin",
+    "amount": 80,
+    "date": "2025-06-14"
   }
 ]
